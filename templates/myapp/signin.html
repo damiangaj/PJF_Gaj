@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <title>Rejestracja</title>
+</head>
+<body>
+ <div class="container">
+        <img src="{% static 'images/logo2.png' %}" alt="Logo">
+    <h2>Sign In</h2>
+         <form action="/signin" method="post">
+           {% csrf_token %}
+     <label for="" style="font-family: 'Your Chosen Font', 'MS Outlook';">Username</label>
+    <input type="text" id="username" name="username" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" required>
+           <br>
+      <label for="">Password</label>
+     <input type="password" id="pass" name="pass" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" required>
+           <br>
+
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sign In</button>
+    </form>
+    <p>You don't have an account yet? <a href="{% url 'signup' %}">Sing Up</a></p>
+ </div>
+</body>
+</html>
