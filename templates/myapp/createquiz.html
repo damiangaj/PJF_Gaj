@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    function logout() {
+        window.location.href = "/signout";
+        document.getElementById('logout-message').style.display = 'block';
+    }
+
+
+        function MyQuiz() {
+            window.location.href = "/myquiz";
+        }
+         function CreateQuiz() {
+            window.location.href = "/createquiz";
+        }
+
+
+
+
+        function MyProfil() {
+            window.location.href = "/myprofile";
+        }
+          function MainPage() {
+            window.location.href = "/account";
+        }
+
+
+</script>
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tworzenie Quizu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .navigation {
+            display: flex;
+            background-color: #555;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .nav-button {
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #45a049;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .quiz-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    .save-quiz-button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-quiz-button {
+            background-color: #3498db;
+            margin-left: 10px;
+        }
+        .question-container input,
+        .question-container textarea,
+        .question-container select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .answer-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-container input {
+            flex: 1;
+        }
+
+        .add-answer-button,
+        .remove-answer-button,
+        .add-question-button,
+        .remove-question-button,
+        .save-quiz-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .save-quiz-button {
+            margin-left: 10px;
+            background-color: #3498db;
+        }
+
+        .correct-answer-list {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <img src="{% static 'images/logo2.png' %}" alt="Logo" class="logo">
+            <p class="user-info">Witaj, {{ username }}</p>
+        </div>
+        <div>
+            <button class="nav-button" onclick="logout()">Wyloguj się</button>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" onclick="MainPage()">Strona Główna</button>
+        <button class="nav-button" onclick="MyProfil()">Profil</button>
+        <button class="nav-button" onclick="MyQuiz()">Moje Quizy</button>
+        <button class="nav-button" onclick="CreateQuiz()">Stwórz Quiz</button>
+
+    </div>
+
+    <div class="container">
+        <div class="quiz-form">
+            <h2>Tworzenie Quizu</h2>
+        <form action="/save_quiz/" method="post">
+              {% csrf_token %}
+            <label for="quiz-title">Tytuł Quizu:</label>
+            <input type="text" id="quiz-title" name="quiz-title" required>
+
+            <div class="question-container" id="question-container-1">
+                <label for="question-1">Pytanie 1:</label>
+                <input type="text" id="question-1" name="question-1" required>
+
+                <div class="answer-container" id="answer-container-1-1">
+                    <label for="answer-1-1">Odpowiedź 1:</label>
+                    <input type="text" id="answer-1-1" name="answer-1-1" required>
+                    <button type="button" onclick="removeAnswer('answer-container-1-1')" class="remove-answer-button">Usuń odpowiedź</button>
+                </div>
+
+                <div class="answer-container" id="answer-container-1-2">
+                    <label for="answer-1-2">Odpowiedź 2:</label>
+                    <input type="text" id="answer-1-2" name="answer-1-2" required>
+                    <button type="button" onclick="removeAnswer('answer-container-1-2')" class="remove-answer-button">Usuń odpowiedź</button>
+                </div>
+
+                <div class="correct-answer-list" id="correct-answer-list-1">
+                    <label for="correct-answer-1">Poprawna odpowiedź:</label>
+                    <select id="correct-answer-1" name="correct-answer-1" required>
+                        <option value="answer-1-1">Odpowiedź 1</option>
+                        <option value="answer-1-2">Odpowiedź 2</option>
+                    </select>
+                </div>
+
+                <button type="button" onclick="addAnswer('question-container-1')" class="add-answer-button">Dodaj kolejną odpowiedź</button>
+
+            </div>
+
+
+
+
+
+
+             {{ form.as_p }}
+        </form>
+            <button type="submit" onclick="saveQuiz()" class="save-quiz-button">Zapisz Quiz</button>
+             <button type="button" onclick="addQuestion()" class="add-question-button">Dodaj kolejne pytanie</button>
+
+        </div>
+    </div>
+
+    <script>
+        function addAnswer(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerCounter = questionContainer.querySelectorAll('.answer-container').length + 1;
+
+            const answerContainer = document.createElement('div');
+            answerContainer.className = 'answer-container';
+            answerContainer.id = `${questionContainerId}-answer-container-${answerCounter}`;
+
+            answerContainer.innerHTML = `
+                <label for="answer-${answerCounter}">Odpowiedź ${answerCounter}:</label>
+                <input type="text" id="answer-${answerCounter}" name="answer-${answerCounter}" required>
+                <button type="button" onclick="removeAnswer('${questionContainerId}-answer-container-${answerCounter}')" class="remove-answer-button">Usuń odpowiedź</button>
+            `;
+
+            questionContainer.insertBefore(answerContainer, questionContainer.querySelector('.correct-answer-list'));
+            updateCorrectAnswerList(questionContainerId);
+            updateAnswerLabels(questionContainerId);
+        }
+    function removeAnswer(answerContainerId) {
+            const answerContainer = document.getElementById(answerContainerId);
+            const questionContainer = answerContainer.closest('.question-container');
+
+            // Usuwanie odpowiedzi z listy rozwijanej
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list');
+            const answerNumber = answerContainerId.split('-').pop();
+            const optionToRemove = correctAnswerList.querySelector(`option[value="answer-${answerNumber}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
+            // Usuwanie odpowiedzi z kontenera
+            answerContainer.remove();
+
+            // Aktualizacja numerów odpowiedzi w liście rozwijanej
+            updateCorrectAnswerList(questionContainer.id);
+        }
+
+        function removeQuestion(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            questionContainer.remove();
+            updateQuestionLabels();
+        }
+
+        function updateCorrectAnswerListLabels(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list select');
+            const options = correctAnswerList.querySelectorAll('option');
+
+            options.forEach((option, index) => {
+                option.text = `Odpowiedź ${index + 1}`;
+            });
+        }
+
+        function updateCorrectAnswerList(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list select');
+            correctAnswerList.innerHTML = '';
+
+            answerContainers.forEach((answerContainer, index) => {
+                const answerId = answerContainer.querySelector('input').id;
+                const option = document.createElement('option');
+                option.value = answerId;
+                option.text = `Odpowiedź ${index + 1}`;
+                correctAnswerList.add(option);
+            });
+        }
+
+        function updateAnswerLabels(questionContainerId, startIndex = 0) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+
+            for (let i = startIndex; i < answerContainers.length; i++) {
+                const answerLabel = answerContainers[i].querySelector('label');
+                answerLabel.innerText = `Odpowiedź ${i + 1}:`;
+            }
+        }
+
+        function updateQuestionLabels() {
+            const questionContainers = document.querySelectorAll('.question-container');
+
+            questionContainers.forEach((questionContainer, index) => {
+                const questionLabel = questionContainer.querySelector('label[for^="question-"]');
+                questionLabel.innerText = `Pytanie ${index + 1}:`;
+            });
+        }
+
+         function addQuestion() {
+            const questionCounter = document.querySelectorAll('.question-container').length + 1;
+            const container = document.querySelector('.quiz-form');
+
+            const questionContainer = document.createElement('div');
+            questionContainer.className = 'question-container';
+            questionContainer.id = `question-container-${questionCounter}`;
+
+            questionContainer.innerHTML = `
+                <label for="question-${questionCounter}">Pytanie ${questionCounter}:</label>
+                <input type="text" id="question-${questionCounter}" name="question-${questionCounter}" required>
+
+                <div class="answer-container" id="answer-container-${questionCounter}-1">
+                    <label for="answer-${questionCounter}-1">Odpowiedź 1:</label>
+                    <input type="text" id="answer-${questionCounter}-1" name="answer-${questionCounter}-1" required>
+                    <button type="button" onclick="removeAnswer('answer-container-${questionCounter}-1')" class="remove-answer-button">Usuń odpowiedź</button>
+                </div>
+
+                <div class="answer-container" id="answer-container-${questionCounter}-2">
+                    <label for="answer-${questionCounter}-2">Odpowiedź 2:</label>
+                    <input type="text" id="answer-${questionCounter}-2" name="answer-${questionCounter}-2" required>
+                    <button type="button" onclick="removeAnswer('answer-container-${questionCounter}-2')" class="remove-answer-button">Usuń odpowiedź</button>
+                </div>
+
+                <div class="correct-answer-list" id="correct-answer-list-${questionCounter}">
+                    <label for="correct-answer-${questionCounter}">Poprawna odpowiedź:</label>
+                    <select id="correct-answer-${questionCounter}" name="correct-answer-${questionCounter}" required>
+                        <option value="answer-${questionCounter}-1">Odpowiedź 1</option>
+                        <option value="answer-${questionCounter}-2">Odpowiedź 2</option>
+                    </select>
+                </div>
+
+                <button type="button" onclick="addAnswer('question-container-${questionCounter}')" class="add-answer-button">Dodaj kolejną odpowiedź</button>
+                <button type="button" onclick="removeQuestion('question-container-${questionCounter}')" class="remove-question-button">Usuń pytanie</button>
+            `;
+
+            container.insertBefore(questionContainer, container.querySelector('.add-question-button'));
+            container.insertBefore(questionContainer, container.querySelector('.save-quiz-button'));
+            updateCorrectAnswerList(`question-container-${questionCounter}`);
+            updateQuestionLabels();
+        }
+
+        function saveQuiz() {
+        const quizTitle = document.getElementById('quiz-title').value;
+        const questionContainers = document.querySelectorAll('.question-container');
+
+        const questionsData = Array.from(questionContainers).map((questionContainer) => {
+            const questionText = questionContainer.querySelector('input[name^="question-"]').value;
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+            const answersData = Array.from(answerContainers).map((answerContainer, index) => {
+                const answerText = answerContainer.querySelector('input[name^="answer-"]').value;
+                const isCorrect = index === document.getElementById(`correct-answer-${questionContainer.id.split('-').pop()}`).selectedIndex;
+                return { answerText, isCorrect };
+            });
+            return { questionText, answersData };
+        });
+
+        const requestData = {
+            'quiz-title': quizTitle,
+            'questions': questionsData,
+        };
+
+        // Wyślij dane na serwer za pomocą żądania AJAX
+        fetch('/save_quiz/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Dodaj token CSRF do nagłówka
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Quiz został zapisany!');
+                // Tutaj możesz dodać dodatkową logikę, na przykład przekierowanie użytkownika
+            } else {
+                alert('Wystąpił błąd podczas zapisywania quizu.');
+            }
+        })
+        .catch(error => console.error('Błąd podczas wysyłania danych:', error));
+
+         window.location.href = "/account";
+    }
+
+    // Funkcja do pobierania wartości ciasteczka CSRF
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    </script>
+</body>
+</html>

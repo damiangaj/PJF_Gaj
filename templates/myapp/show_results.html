@@ -1,0 +1,84 @@
+<!-- results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyniki Quizu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .results-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .nav-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            margin: auto;
+        }
+
+        .nav-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <h1>Wyniki Quizu: {{ quiz.name }}</h1>
+        <ul>
+            {% for result in results %}
+                <li>
+                    <p>Użytkownik: {{ result.user.username }}</p>
+                    <p>Wynik: {{ result.score }} %</p>
+                    <!-- Dodaj więcej informacji, takich jak data, itp., w zależności od potrzeb -->
+                </li>
+            {% endfor %}
+        </ul>
+        <button class="nav-button" onclick="MyQuiz()">Moje Quizy</button>
+    </div>
+
+    <script>
+        function MyQuiz() {
+            window.location.href = "/myquiz";
+        }
+    </script>
+</body>
+</html>
