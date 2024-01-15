@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+ <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .navigation {
+            display: flex;
+            background-color: #555;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .nav-button {
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #45a049;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .quiz-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    .save-quiz-button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-quiz-button {
+            background-color: #3498db;
+            margin-left: 10px;
+        }
+        .question-container input,
+        .question-container textarea,
+        .question-container select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .answer-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-container input {
+            flex: 1;
+        }
+
+        .add-answer-button,
+        .remove-answer-button,
+        .add-question-button,
+        .remove-question-button,
+        .save-quiz-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .save-quiz-button {
+            margin-left: 10px;
+            background-color: #3498db;
+        }
+
+        .correct-answer-list {
+            margin-top: 10px;
+        }
+    </style>
+<head>
+    <!-- Twój kod CSS, nagłówki itp. -->
+</head>
+
+<body>
+    <!-- Twój kod nagłówka, nawigacji itp. -->
+
+         <div class="container">
+        <div class="quiz-form">
+            <h2>Edycja Quizu</h2>
+        <label for="quiz-title">Tytuł Quizu:</label>
+                <input type="text" id="quiz-name" name="quiz-name" value="{{ quiz.name }}" required>
+         <label for="quiz-time">Czas na quiz:</label>
+                <input type="text" id="quiz-time" name="quiz-time" value="{{ quiz.time }}" required>
+            <form method="post" action="'/edit_quiz/' $ {{ quiz.id }} ">
+                {% csrf_token %}
+
+                <!-- Kod dla istniejących pytań i odpowiedzi -->
+                {% for question in questions %}
+                    <div class="question-container" id="question-container-{{ forloop.counter }}">
+                        <label for="question-{{ forloop.counter }}">Pytanie {{ forloop.counter }}:</label>
+                        <input type="text" id="question-{{ forloop.counter }}" name="question-{{ forloop.counter }}" value="{{ question.text }}" required>
+
+                        <!-- Kod dla istniejących odpowiedzi -->
+                        {% with answer_offset=forloop.parentloop.counter %}
+                            {% for answer in answers %}
+                                {% if answer.question_id == question.id %}
+                                    <div class="answer-container" id="answer-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                        <label for="answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">Odpowiedź {{ answer_offset }}.{{ forloop.counter }}:</label>
+                                        <input type="text" id="answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" name="answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" value="{{ answer.text }}" required>
+                                        <button type="button" onclick="removeAnswer('answer-container-{{ forloop.parentloop.counter }}-{{ forloop.counter }}')" class="remove-answer-button">Usuń odpowiedź</button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+
+                        <!-- Lista rozwijana dla odpowiedzi -->
+                        <div class="correct-answer-list" id="correct-answer-list-{{ forloop.counter }}">
+                            <label for="correct-answer-{{ forloop.counter }}">Poprawna odpowiedź:</label>
+                            <select id="correct-answer-{{ forloop.counter }}" name="correct-answer-{{ forloop.counter }}" required>
+                                {% for answer in answers %}
+                                    {% if answer.question_id == question.id %}
+                                        <option value="answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">{{ answer.text }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Przyciski do dodawania/usuwania pytania i odpowiedzi -->
+                        <button type="button" onclick="addAnswer('question-container-{{ forloop.counter }}')" class="add-answer-button">Dodaj kolejną odpowiedź</button>
+                        <button type="button" onclick="removeQuestion('question-container-{{ forloop.counter }}')" class="remove-question-button">Usuń pytanie</button>
+                    </div>
+                {% endfor %}
+
+            </form>
+        </div>
+    </div>
+
+        <script>
+        // Funkcje JavaScript do dodawania i usuwania pytań i odpowiedzi
+    function removeQuestion(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            questionContainer.remove();
+            updateQuestionLabels();
+        }
+        function addAnswer(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerCounter = questionContainer.querySelectorAll('.answer-container').length + 1;
+
+            // Tworzenie nowej odpowiedzi
+            const answerContainer = document.createElement('div');
+            answerContainer.className = 'answer-container';
+            answerContainer.id = `${questionContainerId}-answer-container-${answerCounter}`;
+
+            answerContainer.innerHTML = `
+                <label for="answer-${answerCounter}">Odpowiedź ${answerCounter}:</label>
+                <input type="text" id="answer-${answerCounter}" name="answer-${answerCounter}" required>
+                <button type="button" onclick="removeAnswer('${questionContainerId}-answer-container-${answerCounter}')" class="remove-answer-button">Usuń odpowiedź</button>
+            `;
+
+            // Dodawanie odpowiedzi do kontenera
+            questionContainer.insertBefore(answerContainer, questionContainer.querySelector('.add-answer-button'));
+
+            // Przesuwanie listy rozwijanej za dodaną odpowiedź
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list');
+            questionContainer.insertBefore(correctAnswerList, questionContainer.querySelector('.add-answer-button'));
+
+            // Aktualizacja numerów odpowiedzi w liście rozwijanej
+            updateCorrectAnswerList(questionContainerId);
+        }
+
+               function removeAnswer(answerContainerId) {
+            const answerContainer = document.getElementById(answerContainerId);
+            const questionContainer = answerContainer.closest('.question-container');
+
+            // Usuwanie odpowiedzi z listy rozwijanej
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list select');
+            const answerNumber = answerContainerId.split('-').pop();
+            const optionToRemove = correctAnswerList.querySelector(`option[value="answer-${answerNumber}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
+            // Usuwanie odpowiedzi z kontenera
+            answerContainer.remove();
+
+            // Aktualizacja numerów odpowiedzi w liście rozwijanej
+            updateAnswerLabels(questionContainer.id);
+    updateCorrectAnswerListLabels(questionContainer.id);
+    updateCorrectAnswerList(questionContainer.id);
+
+        }
+
+          function updateAnswerLabels(questionContainerId, startIndex = 0) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+
+            for (let i = startIndex; i < answerContainers.length; i++) {
+                const answerLabel = answerContainers[i].querySelector('label');
+                answerLabel.innerText = `Odpowiedź ${i + 1}:`;
+            }
+        }
+function updateCorrectAnswerList(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list select');
+            correctAnswerList.innerHTML = '';
+
+            answerContainers.forEach((answerContainer, index) => {
+                const answerId = answerContainer.querySelector('input').id;
+                const option = document.createElement('option');
+                option.value = answerId;
+                option.text = `Odpowiedź ${index + 1}`;
+                correctAnswerList.add(option);
+            });
+        }
+             function updateCorrectAnswerListLabels(questionContainerId) {
+            const questionContainer = document.getElementById(questionContainerId);
+            const correctAnswerList = questionContainer.querySelector('.correct-answer-list select');
+            const options = correctAnswerList.querySelectorAll('option');
+
+            options.forEach((option, index) => {
+                option.text = `Odpowiedź ${index + 1}`;
+            });
+        }
+function addQuestion() {
+    const questionCounter = document.querySelectorAll('.question-container').length + 1;
+    const container = document.querySelector('.quiz-form');
+
+    const questionContainer = document.createElement('div');
+    questionContainer.className = 'question-container';
+    questionContainer.id = `question-container-${questionCounter}`;
+
+    questionContainer.innerHTML = `
+        <label for="question-${questionCounter}">Pytanie ${questionCounter}:</label>
+        <input type="text" id="question-${questionCounter}" name="question-${questionCounter}" required>
+
+        <div class="answer-container" id="answer-container-${questionCounter}-1">
+            <label for="answer-${questionCounter}-1">Odpowiedź 1:</label>
+            <input type="text" id="answer-${questionCounter}-1" name="answer-${questionCounter}-1" required>
+            <button type="button" onclick="removeAnswer('answer-container-${questionCounter}-1')" class="remove-answer-button">Usuń odpowiedź</button>
+        </div>
+
+        <div class="answer-container" id="answer-container-${questionCounter}-2">
+            <label for="answer-${questionCounter}-2">Odpowiedź 2:</label>
+            <input type="text" id="answer-${questionCounter}-2" name="answer-${questionCounter}-2" required>
+            <button type="button" onclick="removeAnswer('answer-container-${questionCounter}-2')" class="remove-answer-button">Usuń odpowiedź</button>
+        </div>
+
+        <div class="correct-answer-list" id="correct-answer-list-${questionCounter}">
+            <label for="correct-answer-${questionCounter}">Poprawna odpowiedź:</label>
+            <select id="correct-answer-${questionCounter}" name="correct-answer-${questionCounter}" required>
+                <option value="answer-${questionCounter}-1">Odpowiedź 1</option>
+                <option value="answer-${questionCounter}-2">Odpowiedź 2</option>
+            </select>
+        </div>
+
+        <button type="button" onclick="addAnswer('question-container-${questionCounter}')" class="add-answer-button">Dodaj kolejną odpowiedź</button>
+        <button type="button" onclick="removeQuestion('question-container-${questionCounter}')" class="remove-question-button">Usuń pytanie</button>
+    `;
+
+    container.insertBefore(questionContainer, container.querySelector('.question-buttons-container'));
+
+    updateCorrectAnswerList(`question-container-${questionCounter}`);
+    updateQuestionLabels();
+}
+
+// Poza pętlą pytania dodaj przyciski "Dodaj pytanie" oraz "Zapisz zmiany"
+const container = document.querySelector('.quiz-form');
+const questionButtonsContainer = document.createElement('div');
+questionButtonsContainer.className = 'question-buttons-container';
+
+questionButtonsContainer.innerHTML = `
+    <button type="button" onclick="addQuestion()" class="add-question-button">Dodaj pytanie</button>
+    <button type="submit"  onclick="saveChanges()" class="save-quiz-button">Zapisz Quiz</button>
+`;
+
+container.appendChild(questionButtonsContainer);
+
+
+
+
+        function updateQuestionLabels() {
+            const questionContainers = document.querySelectorAll('.question-container');
+
+            questionContainers.forEach((container, index) => {
+                container.querySelector('label').innerText = `Pytanie ${index + 1}:`;
+            });
+        }
+  function saveChanges() {
+        const quizTitle = document.getElementById('quiz-name').value;
+        const quizTime = document.getElementById('quiz-time').value;
+        console.log(quizTime)
+        const quiz_id = '{{ quiz.id }}';
+        console.log(quiz_id)
+        const questionContainers = document.querySelectorAll('.question-container');
+
+        const questionsData = Array.from(questionContainers).map((questionContainer) => {
+            const questionText = questionContainer.querySelector('input[name^="question-"]').value;
+            const answerContainers = questionContainer.querySelectorAll('.answer-container');
+            const answersData = Array.from(answerContainers).map((answerContainer, index) => {
+                const answerText = answerContainer.querySelector('input[name^="answer-"]').value;
+                const isCorrect = index === document.getElementById(`correct-answer-${questionContainer.id.split('-').pop()}`).selectedIndex;
+                return { answerText, isCorrect };
+            });
+            return { questionText, answersData };
+        });
+
+        const requestData = {
+            'time': quizTime,
+            'quiz-title': quizTitle,
+            'questions': questionsData,
+            'quiz': quiz_id
+        };
+
+        // Wyślij dane na serwer za pomocą żądania AJAX
+        fetch('/update_quiz/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Dodaj token CSRF do nagłówka
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Quiz został zapisany!');
+                // Tutaj możesz dodać dodatkową logikę, na przykład przekierowanie użytkownika
+            } else {
+                alert('Wystąpił błąd podczas zapisywania quizu.');
+            }
+        })
+        .catch(error => console.error('Błąd podczas wysyłania danych:', error));
+         window.location.href = "/account";
+    }
+
+    // Funkcja do pobierania wartości ciasteczka CSRF
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    </script>
+</body>
+
+</html>

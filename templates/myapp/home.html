@@ -1,0 +1,76 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strona Startowa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Zmiana wyrównania */
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .login-button {
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #45a049;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+{% load static %}
+<body>
+    <div class="header">
+        <div>
+            <img src="{% static 'images/logo2.png' %}" alt="Logo" class="logo">
+        </div>
+        <a href="/signin" class="login-button">Zaloguj się</a>
+    </div>
+
+    <div class="content">
+        <h1>Witaj na naszej stronie!</h1>
+        <p>
+            Ta strona umożliwia dostęp do różnych quizów. Zaloguj się, aby mieć pełny dostęp do funkcji serwisu.
+
+        </p>
+        <hr>
+        <p>
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        </p>
+    </div>
+</body>
+<script>
+
+</script>
+</html>
